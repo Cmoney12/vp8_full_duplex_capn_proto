@@ -100,6 +100,7 @@ public:
         packet.type = reader.getType().cStr();
         packet.size = reader.getData().size();
         packet.data = reader.getData().begin();
+
         return packet;
 
     }

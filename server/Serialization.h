@@ -9,7 +9,7 @@
 #include <cinttypes>
 #include <memory>
 #include <capnp/common.h>
-#include "../Proto/Packet.capnp.h"
+#include "Proto/Packet.capnp.h"
 #include <capnp/message.h>
 #include <capnp/serialize-packed.h>
 
