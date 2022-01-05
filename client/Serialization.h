@@ -80,8 +80,8 @@ public:
         //const auto c = m.asBytes();
 
         set_size(arrayOutputStream.getArray().size());
-        encode_header();
         std::memcpy(data_.get() + HEADER_LENGTH, arrayOutputStream.getArray().begin(),  arrayOutputStream.getArray().size());
+        encode_header();
 
     }
 

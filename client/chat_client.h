@@ -39,8 +39,9 @@ public:
                           {
                               bool write_in_progress = !write_msgs_.empty();
                               write_msgs_.push_back(msg);
-                              if (!write_in_progress)
+                              if (!write_in_progress && username_sent)
                               {
+                                  std::lock_guard<std::mutex> lock {mutex};
                                   do_write();
                               }
                           });
@@ -56,6 +57,8 @@ public:
                                  [this](boost::system::error_code ec, std::size_t) {
                                      if (ec) {
                                          socket_.close();
+                                     } else {
+                                         username_sent = true;
                                      }
                                  });
     }
@@ -85,7 +88,7 @@ private:
                                     }
                                     else
                                     {
-                                        std::cout << ec << std::endl;
+                                        std::cerr << ec << " do_read_header"<< std::endl;
                                         socket_.close();
                                     }
                                 });
@@ -112,7 +115,7 @@ private:
                                     }
                                     else
                                     {
-                                        std::cout << ec << std::endl;
+                                        std::cerr << ec << " do_read_body" << std::endl;
                                         socket_.close();
                                     }
                                 });
@@ -135,13 +138,15 @@ private:
                                      }
                                      else
                                      {
-                                         std::cout << ec << std::endl;
+                                         std::cout << ec << " do_write" << std::endl;
                                          socket_.close();
                                      }
                                  });
     }
 
 private:
+    bool username_sent = false;
+    std::mutex mutex;
     //std::mutex mtx;
     boost::asio::io_context& io_context_;
     tcp::socket socket_;

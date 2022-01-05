@@ -9,15 +9,14 @@
 #include <opencv4/opencv2/opencv.hpp>
 #include <vpx/vpx_decoder.h>
 #include <vpx/vp8dx.h>
-#include <queue>
+#include "../ThreadSafeDeque.h"
 
 class Decoder {
 public:
-    std::queue<cv::Mat> frame_queue;
     Decoder(int& width, int& height) {
         codec_context_.reset(new vpx_codec_ctx_t());
         decoder_config_.reset(new vpx_codec_dec_cfg());
-        decoder_config_->threads = 1;
+        decoder_config_->threads = 2;
         decoder_config_->w = static_cast<unsigned int>(width);
         decoder_config_->h = static_cast<unsigned int>(height);
 
@@ -58,22 +57,30 @@ public:
             cv::Mat bgr;
             //cv::cvtColor(i420, bgr, cv::COLOR_YUV2BGR_I420);
             cv::cvtColor(i420, bgr, cv::COLOR_YUV2RGB_I420);
-            frame_queue.push(bgr);
-
+            //frame_queue_.push_back(bgr);
             //delegate_->onFrameDecoded(bgr);
+            show_frame(bgr);
         }
     }
 
+    void show_frame(cv::Mat& frame) {
+        cv::imshow("Video", frame);
+        cv::waitKey(1);
+    }
+
+
     void display() {
-        if (!frame_queue.empty()) {
-            cv::Mat decoded_frame = frame_queue.front();
-            frame_queue.pop();
+        if (!frame_queue_.empty()) {
+            cv::Mat decoded_frame;
+            frame_queue_.pop_front_waiting(decoded_frame);
             cv::imshow("Video", decoded_frame);
             cv::waitKey(1);
         }
     }
 
 private:
+    ThreadSafeDeque<cv::Mat> frame_queue_{};
+    //std::deque<cv::Mat> frame_queue_{};
     std::shared_ptr<vpx_codec_ctx_t> codec_context_;
     std::shared_ptr<vpx_codec_dec_cfg_t> decoder_config_;
 };

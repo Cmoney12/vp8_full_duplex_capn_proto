@@ -43,6 +43,7 @@ public:
         char username_line[len + 2];
         std::strcpy(username_line, username_);
         std::strcat(username_line, "\n");
+        std::cout << "username len " << std::strlen(username_line) << std::endl;
         client->send_username(username_line);
         std::cout << username_line;
     }
@@ -81,7 +82,6 @@ public:
             std::shared_ptr<VideoPacket> packet = encoder->encode(image);
 
             if (packet != nullptr && packet->size > 0) {
-                std::cout << packet->size << std::endl;
                 std::shared_ptr<Serialization> message = std::make_shared<Serialization>();
                 message->create_packet(username_, username_, type, packet->data.get(), packet->size);
                 client->write(message);

@@ -92,6 +92,7 @@ public:
         //if (frame_count_ % keyframe_forced_interval_ == 0)
         //    flags |= VPX_EFLAG_FORCE_KF;
 
+
         vpx_codec_iter_t iter = nullptr;
         const vpx_codec_cx_pkt_t *pkt = nullptr;
 
